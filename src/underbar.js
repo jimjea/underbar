@@ -298,6 +298,13 @@ var _ = {};
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
+    var passedFunctions = {};
+    return function(key) {
+      if(!(key in passedFunctions)) {
+        passedFunctions[key] = func.call(null,key);
+      }
+      return passedFunctions[key];
+    };
   };
 
   // Delays a function for the given number of milliseconds, and then calls
@@ -307,6 +314,12 @@ var _ = {};
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
+    //converts arguments into an array
+    var args = Array.prototype.slice.call(arguments);
+    setTimeout(function() {
+      //have to use apply is order to call arguments as an arg
+      func.apply(null, args.slice(2));
+    }, wait);
   };
 
 
@@ -321,6 +334,25 @@ var _ = {};
   // input array. For a tip on how to make a copy of an array, see:
   // http://mdn.io/Array.prototype.slice
   _.shuffle = function(array) {
+    //slice original array to avoid changing the original array
+    var arr = array.slice(0);
+    var random;
+    var temp;
+    //start backwards becase we will be generating random indexi for the array elements
+    for (var i = array.length - 1; i >= 0; i --) {
+      //get a random place in the array that is lower than the index
+      random = Math.floor(Math.random() * i);
+      //store the random element
+      //need to store in this var bc we have to replace the current index with THIS value, not
+      //ANOTHER random index
+      temp = arr[random];
+      //replace the random index with the current index so that we eliminate it from appearing again
+      //and also make sure to include the current index later
+      arr[random] = arr[i];
+      //now replace the current index with the random index
+      arr[i] = temp;
+    }
+    return arr;
   };
 
 
